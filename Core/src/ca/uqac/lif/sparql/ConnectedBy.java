@@ -20,13 +20,16 @@ package ca.uqac.lif.sparql;
 import java.util.Set;
 
 import ca.uqac.lif.cep.Context;
+import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.functions.Function;
-import ca.uqac.lif.cep.functions.UnaryFunction;
 
 /**
  * Asserts that two nodes in a knowledge graph are connected by an edge
  * with a given label. There are two variants of this assertion, depending
  * on whether the edge is directed or not.
+ * <p>
+ * The function can be used directly to form assertions, or as a BeepBeep
+ * {@link Function} object that can be given as a parameter to processors.
  * @author Sylvain Hallé
  */
 public abstract class ConnectedBy extends Function implements GraphAssertion 
@@ -146,13 +149,23 @@ public abstract class ConnectedBy extends Function implements GraphAssertion
 			Object to = nu.getOrDefault(m_to, m_to);
 			return graph.matches(from, edge, to);
 		}
-
+		
 		@Override
-		public Boolean getValue(KnowledgeGraph g, Context c)
+		public DirectedConnectedBy duplicate(boolean with_state)
 		{
-			
-			return null;
+			return new DirectedConnectedBy(m_from, m_label, m_to);
 		}
+		
+		@Override
+		public void evaluate(Object[] inputs, Object[] outputs, Context c, EventTracker t)
+		{
+			KnowledgeGraph g = (KnowledgeGraph) inputs[0];
+			Object from = c.getOrDefault(m_from, m_from);
+			Object edge = c.getOrDefault(m_label, m_label);
+			Object to = c.getOrDefault(m_to, m_to);
+			outputs[0] = g.matches(from, edge, to);
+		}
+
 	}
 	
 	public static class UndirectedConnectedBy extends ConnectedBy
@@ -169,6 +182,22 @@ public abstract class ConnectedBy extends Function implements GraphAssertion
 			Object edge = nu.getOrDefault(m_label, m_label);
 			Object to = nu.getOrDefault(m_to, m_to);
 			return graph.matches(from, edge, to) || graph.matches(to, edge, from);
+		}
+		
+		@Override
+		public UndirectedConnectedBy duplicate(boolean with_state)
+		{
+			return new UndirectedConnectedBy(m_from, m_label, m_to);
+		}
+		
+		@Override
+		public void evaluate(Object[] inputs, Object[] outputs, Context c, EventTracker t)
+		{
+			KnowledgeGraph g = (KnowledgeGraph) inputs[0];
+			Object from = c.getOrDefault(m_from, m_from);
+			Object edge = c.getOrDefault(m_label, m_label);
+			Object to = c.getOrDefault(m_to, m_to);
+			outputs[0] = g.matches(from, edge, to) || g.matches(to, edge, from);
 		}
 	}
 }

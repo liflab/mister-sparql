@@ -15,33 +15,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package ca.uqac.lif.sparql;
-
-import java.util.Collection;
-
-import ca.uqac.lif.cep.functions.UnaryFunction;
 
 /**
- * BeepBeep function extracting nodes from a knowledge graph.
- * @author Sylvain Hallé 
+ * Examples using the library as a BeepBeep palette.
  */
-@SuppressWarnings("rawtypes")
-public class GetNodes extends UnaryFunction<KnowledgeGraph,Collection>
-{
-	public GetNodes()
-	{
-		super(KnowledgeGraph.class, Collection.class);
-	}
-
-	@Override
-	public Collection getValue(KnowledgeGraph g)
-	{
-		return g.getNodes();
-	}
-	
-	@Override
-	public GetNodes duplicate(boolean with_state)
-	{
-		return new GetNodes();
-	}
-}
+package beepbeep;

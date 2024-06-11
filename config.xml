@@ -53,18 +53,19 @@
   -->
   <dependencies>
     <dependency>
-      <!-- This entry points to a nonexistent class on purpose, to test
-      whether the detection/download of dependencies works. Delete this in
-      a real-world project.
-      -->
       <name>BeepBeep 3 Core</name>
       <classname>ca.uqac.lif.cep.Processor</classname>
       <files>
-        <!-- You typically need only one of these two for each dependency -->
         <jar>https://github.com/liflab/beepbeep-3/releases/download/v0.11.1/beepbeep-3-0.11.1.jar</jar>
       </files>
-      <!-- The following parameter is mandatory. Set it to false if you don't
-           want this library to be bundled into the compiled JAR. -->
+      <bundle>false</bundle>
+    </dependency>
+    <dependency>
+      <name>BeepBeep 3 LTL Palette</name>
+      <classname>ca.uqac.lif.cep.ltl.Troolean</classname>
+      <files>
+        <jar>https://github.com/liflab/beepbeep-3-palettes/releases/download/v0.7/ltl-0.7.jar</jar>
+      </files>
       <bundle>false</bundle>
     </dependency>
   </dependencies>
