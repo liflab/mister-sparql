@@ -15,6 +15,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package plain;
+
 import ca.uqac.lif.sparql.DotGraphParser;
 import ca.uqac.lif.sparql.GraphAssertion;
 import ca.uqac.lif.sparql.KnowledgeGraph;
@@ -46,7 +48,7 @@ public class TicTacToe
 	public static void main(String[] args)
 	{
 		// Parse the graph with empty node labels from the DOT file
-		KnowledgeGraph g = s_parser.parse(TicTacToe.class.getResourceAsStream("data/tic-tac-toe.dot"));
+		KnowledgeGraph g = s_parser.parse(TicTacToe.class.getResourceAsStream("../data/tic-tac-toe.dot"));
 		
 		// Set labels for the nodes to represent the game state
 		String grid = "XO "

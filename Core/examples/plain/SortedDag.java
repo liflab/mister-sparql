@@ -15,6 +15,8 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package plain;
+
 import ca.uqac.lif.sparql.DotGraphParser;
 import ca.uqac.lif.sparql.GraphAssertion;
 import ca.uqac.lif.sparql.KnowledgeGraph;
@@ -38,14 +40,14 @@ public class SortedDag
 	 */
 	public static void main(String[] args)
 	{
-		// Parse the graph with empty node labels from the DOT file
-		KnowledgeGraph g = s_parser.parse(SortedDag.class.getResourceAsStream("data/sorted-dag.dot"));
+		/* Parse the graph with empty node labels from the DOT file. */
+		KnowledgeGraph g = s_parser.parse(SortedDag.class.getResourceAsStream("../data/sorted-dag.dot"));
 		
-		// Express the condition that the graph is a sorted DAG
+		/* Express the condition that the graph is a sorted DAG. */
 		GraphAssertion sorted = allNodes("$x", allNodes("$y",
 				implies(connected("$x", "", "$y"), gt(l("$y"), l("$x")))));
 		
-		// Evaluate the assertion
+		/* Evaluate the assertion. */
 		System.out.println(sorted.evaluate(g));
 	}
 }

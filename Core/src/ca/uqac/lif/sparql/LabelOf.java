@@ -17,11 +17,15 @@
  */
 package ca.uqac.lif.sparql;
 
+import ca.uqac.lif.cep.Context;
+import ca.uqac.lif.cep.EventTracker;
+import ca.uqac.lif.cep.functions.Function;
+
 /**
  * A function extracting the label of a node designated by a variable.
  * @author Sylvain Hallé
  */
-public class LabelOf implements GraphFunction<Object>
+public class LabelOf extends ContextFunction implements GraphFunction<Object>
 {
 	/**
 	 * Creates a new instance of this function.
@@ -62,5 +66,33 @@ public class LabelOf implements GraphFunction<Object>
 		}
 		GraphNode node = (GraphNode) o;
 		return node.getData();
+	}
+	
+	@Override
+	public Class<?> getOutputTypeFor(int index)
+	{
+		if (index == 1)
+		{
+			return Object.class;
+		}
+		return null;
+	}
+
+	@Override
+	public Function duplicate(boolean with_state)
+	{
+		return new LabelOf(m_variable);
+	}
+
+	@Override
+	public void evaluate(Object[] inputs, Object[] outputs, Context c, EventTracker t)
+	{
+		Object o = getFromContext(c, m_variable, null);
+		if (o == null || !(o instanceof GraphNode))
+		{
+			outputs[0] = null;
+		}
+		GraphNode node = (GraphNode) o;
+		outputs[0] = node.getData();
 	}
 }

@@ -17,11 +17,10 @@
  */
 package ca.uqac.lif.sparql;
 
-import java.util.Set;
-
 import ca.uqac.lif.cep.Context;
 import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.functions.Function;
+import ca.uqac.lif.cep.ltl.Troolean;
 
 /**
  * Asserts that two nodes in a knowledge graph are connected by an edge
@@ -32,7 +31,7 @@ import ca.uqac.lif.cep.functions.Function;
  * {@link Function} object that can be given as a parameter to processors.
  * @author Sylvain Hallé
  */
-public abstract class ConnectedBy extends Function implements GraphAssertion 
+public abstract class ConnectedBy extends ContextFunction implements GraphAssertion 
 {
 	/**
 	 * Creates a new assertion that two nodes are connected by an edge with a given
@@ -104,27 +103,6 @@ public abstract class ConnectedBy extends Function implements GraphAssertion
 	}
 	
 	@Override
-	public int getInputArity()
-	{
-		return 1;
-	}
-	
-	@Override
-	public int getOutputArity()
-	{
-		return 1;
-	}
-	
-	@Override
-	public void getInputTypesFor(Set<Class<?>> set, int index)
-	{
-		if (index == 1)
-		{
-			set.add(KnowledgeGraph.class);
-		}
-	}
-	
-	@Override
 	public Class<?> getOutputTypeFor(int index)
 	{
 		if (index == 1)
@@ -160,12 +138,11 @@ public abstract class ConnectedBy extends Function implements GraphAssertion
 		public void evaluate(Object[] inputs, Object[] outputs, Context c, EventTracker t)
 		{
 			KnowledgeGraph g = (KnowledgeGraph) inputs[0];
-			Object from = c.getOrDefault(m_from, m_from);
-			Object edge = c.getOrDefault(m_label, m_label);
-			Object to = c.getOrDefault(m_to, m_to);
-			outputs[0] = g.matches(from, edge, to);
+			Object from = getFromContext(c, m_from, m_from);
+			Object edge = getFromContext(c, m_label, m_label);
+			Object to = getFromContext(c, m_to, m_to);
+			outputs[0] = g.matches(from, edge, to) ? Troolean.Value.TRUE : Troolean.Value.FALSE;
 		}
-
 	}
 	
 	public static class UndirectedConnectedBy extends ConnectedBy
