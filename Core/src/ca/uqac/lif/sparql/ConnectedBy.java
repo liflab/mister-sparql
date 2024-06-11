@@ -17,13 +17,19 @@
  */
 package ca.uqac.lif.sparql;
 
+import java.util.Set;
+
+import ca.uqac.lif.cep.Context;
+import ca.uqac.lif.cep.functions.Function;
+import ca.uqac.lif.cep.functions.UnaryFunction;
+
 /**
  * Asserts that two nodes in a knowledge graph are connected by an edge
  * with a given label. There are two variants of this assertion, depending
  * on whether the edge is directed or not.
  * @author Sylvain Hallé
  */
-public abstract class ConnectedBy implements GraphAssertion
+public abstract class ConnectedBy extends Function implements GraphAssertion 
 {
 	/**
 	 * Creates a new assertion that two nodes are connected by an edge with a given
@@ -94,6 +100,37 @@ public abstract class ConnectedBy implements GraphAssertion
 		m_to = to;
 	}
 	
+	@Override
+	public int getInputArity()
+	{
+		return 1;
+	}
+	
+	@Override
+	public int getOutputArity()
+	{
+		return 1;
+	}
+	
+	@Override
+	public void getInputTypesFor(Set<Class<?>> set, int index)
+	{
+		if (index == 1)
+		{
+			set.add(KnowledgeGraph.class);
+		}
+	}
+	
+	@Override
+	public Class<?> getOutputTypeFor(int index)
+	{
+		if (index == 1)
+		{
+			return Boolean.class;
+		}
+		return null;
+	}
+	
 	public static class DirectedConnectedBy extends ConnectedBy
 	{
 		public DirectedConnectedBy(String from, String label, String to)
@@ -108,6 +145,13 @@ public abstract class ConnectedBy implements GraphAssertion
 			Object edge = nu.getOrDefault(m_label, m_label);
 			Object to = nu.getOrDefault(m_to, m_to);
 			return graph.matches(from, edge, to);
+		}
+
+		@Override
+		public Boolean getValue(KnowledgeGraph g, Context c)
+		{
+			
+			return null;
 		}
 	}
 	
