@@ -31,12 +31,18 @@ import ca.uqac.lif.sparql.KnowledgeGraph;
  * Evaluates the LTL-QG formula stipulating that there exists a node
  * that has the same label in every state.
  */
-public class SameLabel
+public class OnlyNeighborsChange
 {
 
 	public static void main(String[] args)
 	{
-		Processor phi = existsNode("$x", G(eq(l("$x"), l(dot("$x")))));
+		Processor phi = G(
+				forAllNodes("$x",
+					forAllNodes("$y",
+						X(implies(
+								and(not(apply(eq(l("$x"), l(dot("$x"))))), not(apply(eq(l("$y"), l(dot("$y")))))),
+										apply(connected("$x", "r", "$y")))
+								))));
 		Println print = new Println();
 		connect(phi, print);
 		Pushable p = phi.getPushableInput();
@@ -45,6 +51,7 @@ public class SameLabel
 			KnowledgeGraph g = new KnowledgeGraph();
 			g.add(new GraphNode(0, "A"));
 			g.add(new GraphNode(1, "B"));
+			g.add(new GraphNode(2, "C"));
 			g.add(new GraphEdge(0, "r", 1));
 			p.push(g);
 		}
@@ -53,18 +60,10 @@ public class SameLabel
 			 * with respect to the previous graph, but this does not matter for
 			 * the property to evaluate. */
 			KnowledgeGraph g = new KnowledgeGraph();
-			g.add(new GraphNode(1, "C"));
-			g.add(new GraphNode(0, "A"));
-			g.add(new GraphEdge(1, "r", 0));
-			p.push(g);
-		}
-		{
-			/* Create and push a third graph. This graph does not satisfy the
-			 * condition, causing the temporal formula to become false. */
-			KnowledgeGraph g = new KnowledgeGraph();
-			g.add(new GraphNode(1, "C"));
-			g.add(new GraphNode(0, "D"));
-			g.add(new GraphEdge(1, "z", 0));
+			g.add(new GraphNode(0, "C"));
+			g.add(new GraphNode(1, "D"));
+			g.add(new GraphNode(2, "Z"));
+			g.add(new GraphEdge(0, "r", 1));
 			p.push(g);
 		}
 	}

@@ -8,6 +8,7 @@ import ca.uqac.lif.cep.ltl.After;
 import ca.uqac.lif.cep.ltl.Always;
 import ca.uqac.lif.cep.ltl.Every;
 import ca.uqac.lif.cep.ltl.Some;
+import ca.uqac.lif.cep.ltl.Sometime;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.ltl.TrooleanCast;
 import ca.uqac.lif.cep.util.Equals;
@@ -15,6 +16,9 @@ import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.sparql.GetNodes;
 import ca.uqac.lif.sparql.LabelOf;
 import ca.uqac.lif.sparql.Placeholder;
+import ca.uqac.lif.sparql.TrooleanAndProcessor;
+import ca.uqac.lif.sparql.TrooleanImpliesProcessor;
+import ca.uqac.lif.sparql.TrooleanNotProcessor;
 import ca.uqac.lif.sparql.ConnectedBy;
 
 public class Shortcuts
@@ -44,9 +48,19 @@ public class Shortcuts
 		return new ApplyFunction(f);
 	}
 	
-	public static Function implies(Function phi, Function psi)
+	public static Processor implies(Processor phi, Processor psi)
 	{
-		return new FunctionTree(Troolean.IMPLIES_FUNCTION, cast(phi), cast(psi));
+		return new TrooleanImpliesProcessor(phi, psi);
+	}
+	
+	public static Processor and(Processor phi, Processor psi)
+	{
+		return new TrooleanAndProcessor(phi, psi);
+	}
+	
+	public static Processor not(Processor phi)
+	{
+		return new TrooleanNotProcessor(phi);
 	}
 	
 	public static Function l(Object x)
@@ -59,7 +73,7 @@ public class Shortcuts
 		return new Placeholder.DottedNodePlaceholder(s);
 	}
 	
-	public static Function connected(String from, String label, String to)
+	public static Function connected(Object from, Object label, Object to)
 	{
 		return ConnectedBy.connected(from, label, to);
 	}
@@ -82,6 +96,16 @@ public class Shortcuts
 	public static Processor G(Function f)
 	{
 		return new Always(apply(f));
+	}
+	
+	public static Processor F(Processor phi)
+	{
+		return new Sometime(phi);
+	}
+	
+	public static Processor F(Function f)
+	{
+		return new Sometime(apply(f));
 	}
 	
 	public static Processor X(Processor phi)

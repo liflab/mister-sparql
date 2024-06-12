@@ -48,11 +48,11 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 	 *          The variable standing for the destination node of the connection
 	 * @return The assertion
 	 */
-	public static DirectedConnectedBy connected(String from, String label, String to)
+	public static DirectedConnectedBy connected(Object from, Object label, Object to)
 	{
-		Placeholder<?> p_from = from.startsWith("$") ? new NodePlaceholder(from) : new LabelPlaceholder(from);
-		Placeholder<?> p_label = from.startsWith("$") ? new NodePlaceholder(label) : new LabelPlaceholder(label);
-		Placeholder<?> p_to = from.startsWith("$") ? new NodePlaceholder(to) : new LabelPlaceholder(to);
+		Placeholder<?> p_from = Placeholder.getNodePlaceholder(from);
+		Placeholder<?> p_label = new LabelPlaceholder((String) label);
+		Placeholder<?> p_to = Placeholder.getNodePlaceholder(to);
 		return new DirectedConnectedBy(p_from, p_label, p_to);
 	}
 	
