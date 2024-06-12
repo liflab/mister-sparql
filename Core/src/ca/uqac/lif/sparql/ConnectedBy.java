@@ -105,7 +105,7 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 	@Override
 	public Class<?> getOutputTypeFor(int index)
 	{
-		if (index == 1)
+		if (index == 0)
 		{
 			return Boolean.class;
 		}

@@ -40,7 +40,7 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	}
 	
 	/** 
-	 * The value of the constant.
+	 * The value of the variable.
 	 */
 	protected final String m_variable;
 
@@ -71,7 +71,7 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	@Override
 	public Class<?> getOutputTypeFor(int index)
 	{
-		if (index == 1)
+		if (index == 0)
 		{
 			return Object.class;
 		}

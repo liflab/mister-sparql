@@ -17,13 +17,13 @@
  */
 package beepbeep;
 
+import static beepbeep.Shortcuts.G;
+import static beepbeep.Shortcuts.connected;
 import static ca.uqac.lif.cep.Connector.connect;
 
+import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
-import ca.uqac.lif.cep.functions.ApplyFunction;
 import ca.uqac.lif.cep.io.Print.Println;
-import ca.uqac.lif.cep.ltl.Always;
-import ca.uqac.lif.sparql.ConnectedBy.DirectedConnectedBy;
 import ca.uqac.lif.sparql.GraphEdge;
 import ca.uqac.lif.sparql.GraphNode;
 import ca.uqac.lif.sparql.KnowledgeGraph;
@@ -37,8 +37,7 @@ public class AlwaysAB
 
 	public static void main(String[] args)
 	{
-		Always always = new Always(
-				new ApplyFunction(new DirectedConnectedBy("A", "r", "B")));
+		Processor always = G(connected("A", "r", "B"));
 		Println print = new Println();
 		connect(always, print);
 		Pushable p = always.getPushableInput();
