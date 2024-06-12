@@ -18,14 +18,16 @@
 package beepbeep;
 
 import static ca.uqac.lif.cep.Connector.connect;
+import static ca.uqac.lif.sparql.Grammar.*;
 
+import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.functions.ApplyFunction;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.io.Print.Println;
-import ca.uqac.lif.cep.ltl.ForAll;
-import ca.uqac.lif.cep.ltl.SoftCast;
-import ca.uqac.lif.cep.util.Booleans;
+import ca.uqac.lif.cep.ltl.Every;
+import ca.uqac.lif.cep.ltl.Troolean;
+import ca.uqac.lif.cep.ltl.TrooleanCast;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.sparql.ConnectedBy.DirectedConnectedBy;
 import ca.uqac.lif.sparql.DotGraphParser;
@@ -53,12 +55,11 @@ public class SortedDag
 		KnowledgeGraph g = s_parser.parse(SortedDag.class.getResourceAsStream("../data/sorted-dag.dot"));
 
 		/* Express the condition that the graph is a sorted DAG. */
-		ForAll sorted = new ForAll("$x", new GetNodes(),
-				new ForAll("$y", new GetNodes(),
-						new ApplyFunction(new FunctionTree(SoftCast.instance,
-								new FunctionTree(Booleans.implies, 
-										new DirectedConnectedBy("$x", "", "$y"), 
-										new FunctionTree(Numbers.isGreaterThan,
+		Processor sorted = forAllNodes("$x",
+				forAllNodes("$y",
+						apply(implies(
+									new FunctionTree(TrooleanCast.instance, new DirectedConnectedBy("$x", "", "$y")), 
+									new FunctionTree(TrooleanCast.instance, new FunctionTree(Numbers.isGreaterThan,
                          new LabelOf("$y"), new LabelOf("$x")))))));
 		
 		/* Evaluate the assertion. */
