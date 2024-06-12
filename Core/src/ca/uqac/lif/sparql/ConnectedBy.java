@@ -21,6 +21,9 @@ import ca.uqac.lif.cep.Context;
 import ca.uqac.lif.cep.EventTracker;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.ltl.Troolean;
+import ca.uqac.lif.sparql.Placeholder.DottedNodePlaceholder;
+import ca.uqac.lif.sparql.Placeholder.LabelPlaceholder;
+import ca.uqac.lif.sparql.Placeholder.NodePlaceholder;
 
 /**
  * Asserts that two nodes in a knowledge graph are connected by an edge
@@ -45,9 +48,12 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 	 *          The variable standing for the destination node of the connection
 	 * @return The assertion
 	 */
-	public static GraphAssertion connected(String from, String label, String to)
+	public static DirectedConnectedBy connected(String from, String label, String to)
 	{
-		return new DirectedConnectedBy(from, label, to);
+		Placeholder<?> p_from = from.startsWith("$") ? new NodePlaceholder(from) : new LabelPlaceholder(from);
+		Placeholder<?> p_label = from.startsWith("$") ? new NodePlaceholder(label) : new LabelPlaceholder(label);
+		Placeholder<?> p_to = from.startsWith("$") ? new NodePlaceholder(to) : new LabelPlaceholder(to);
+		return new DirectedConnectedBy(p_from, p_label, p_to);
 	}
 	
 	/**
@@ -62,25 +68,28 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 	 *          The variable standing for the destination node of the connection
 	 * @return The assertion
 	 */
-	public static GraphAssertion connectedUndir(String from, String label, String to)
+	public static UndirectedConnectedBy connectedUndir(String from, String label, String to)
 	{
-		return new UndirectedConnectedBy(from, label, to);
+		Placeholder<?> p_from = from.startsWith("$") ? new NodePlaceholder(from) : new LabelPlaceholder(from);
+		Placeholder<?> p_label = from.startsWith("$") ? new NodePlaceholder(label) : new LabelPlaceholder(label);
+		Placeholder<?> p_to = from.startsWith("$") ? new NodePlaceholder(to) : new LabelPlaceholder(to);
+		return new UndirectedConnectedBy(p_from, p_label, p_to);
 	}
 
 	/**
 	 * The variable standing for the source node of the connection.
 	 */
-	protected final String m_from;
+	protected final Placeholder<?> m_from;
 
 	/**
 	 * The label of the edge connecting the two nodes.
 	 */
-	protected final String m_label;
+	protected final Placeholder<?> m_label;
 
 	/**
 	 * The variable standing for the destination node of the connection.
 	 */
-	protected final String m_to;
+	protected final Placeholder<?> m_to;
 
 	/**
 	 * Creates a new assertion that two nodes are connected by an edge with a given
@@ -94,7 +103,7 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 	 *          The variable standing for the destination node of the connection
 	 * @return The assertion
 	 */
-	public ConnectedBy(String from, String label, String to)
+	public ConnectedBy(Placeholder<?> from, Placeholder<?> label, Placeholder<?> to)
 	{
 		super();
 		m_from = from;
@@ -114,7 +123,7 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 	
 	public static class DirectedConnectedBy extends ConnectedBy
 	{
-		public DirectedConnectedBy(String from, String label, String to)
+		public DirectedConnectedBy(Placeholder<?> from, Placeholder<?> label, Placeholder<?> to)
 		{
 			super(from, label, to);
 		}
@@ -122,9 +131,9 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 		@Override
 		public Boolean evaluate(KnowledgeGraph graph, Valuation nu)
 		{
-			Object from = nu.getOrDefault(m_from, m_from);
-			Object edge = nu.getOrDefault(m_label, m_label);
-			Object to = nu.getOrDefault(m_to, m_to);
+			Object from = m_from.getValue(graph, nu);
+			Object edge = m_label.getValue(graph, nu);
+			Object to = m_to.getValue(graph, nu);
 			return graph.matches(from, edge, to);
 		}
 		
@@ -147,7 +156,7 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 	
 	public static class UndirectedConnectedBy extends ConnectedBy
 	{
-		public UndirectedConnectedBy(String from, String label, String to)
+		public UndirectedConnectedBy(Placeholder<?> from, Placeholder<?> label, Placeholder<?> to)
 		{
 			super(from, label, to);
 		}
@@ -155,9 +164,9 @@ public abstract class ConnectedBy extends ContextFunction implements GraphAssert
 		@Override
 		public Boolean evaluate(KnowledgeGraph graph, Valuation nu)
 		{
-			Object from = nu.getOrDefault(m_from, m_from);
-			Object edge = nu.getOrDefault(m_label, m_label);
-			Object to = nu.getOrDefault(m_to, m_to);
+			Object from = m_from.getValue(graph, nu);
+			Object edge = m_label.getValue(graph, nu);
+			Object to = m_to.getValue(graph, nu);
 			return graph.matches(from, edge, to) || graph.matches(to, edge, from);
 		}
 		

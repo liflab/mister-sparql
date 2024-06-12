@@ -17,23 +17,14 @@
  */
 package beepbeep;
 
+import static beepbeep.Shortcuts.*;
 import static ca.uqac.lif.cep.Connector.connect;
-import static ca.uqac.lif.sparql.Grammar.*;
 
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
-import ca.uqac.lif.cep.functions.ApplyFunction;
-import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.io.Print.Println;
-import ca.uqac.lif.cep.ltl.Every;
-import ca.uqac.lif.cep.ltl.Troolean;
-import ca.uqac.lif.cep.ltl.TrooleanCast;
-import ca.uqac.lif.cep.util.Numbers;
-import ca.uqac.lif.sparql.ConnectedBy.DirectedConnectedBy;
 import ca.uqac.lif.sparql.DotGraphParser;
-import ca.uqac.lif.sparql.GetNodes;
 import ca.uqac.lif.sparql.KnowledgeGraph;
-import ca.uqac.lif.sparql.LabelOf;
 
 /**
  * Variant of {@link plain.SortedDag} expressed as a BeepBeep function.
@@ -44,8 +35,8 @@ public class SortedDag
 	 * The parser used to parse DOT files.
 	 */
 	protected static final DotGraphParser s_parser = new DotGraphParser();
-	
-	/**                
+
+	/**
 	 * Runs the example.
 	 * @param args Command-line arguments (none is expected)
 	 */
@@ -55,13 +46,11 @@ public class SortedDag
 		KnowledgeGraph g = s_parser.parse(SortedDag.class.getResourceAsStream("../data/sorted-dag.dot"));
 
 		/* Express the condition that the graph is a sorted DAG. */
-		Processor sorted = forAllNodes("$x",
-				forAllNodes("$y",
-						apply(implies(
-									new FunctionTree(TrooleanCast.instance, new DirectedConnectedBy("$x", "", "$y")), 
-									new FunctionTree(TrooleanCast.instance, new FunctionTree(Numbers.isGreaterThan,
-                         new LabelOf("$y"), new LabelOf("$x")))))));
-		
+		Processor sorted = forAllNodes("$x", forAllNodes("$y",
+				implies(
+						connected("$x", "", "$y"), 
+						gt(l("$y"), l("$x")))));
+
 		/* Evaluate the assertion. */
 		Println print = new Println();
 		connect(sorted, print);

@@ -34,15 +34,16 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	 *          The variable
 	 * @return The instance 
 	 * */
-	public static LabelOf l(String variable)
+	public static LabelOf l(Object o)
 	{
-		return new LabelOf(variable);
+		Placeholder<?> p_variable = Placeholder.getNodePlaceholder(o); 
+		return new LabelOf(p_variable);
 	}
 	
 	/** 
 	 * The value of the variable.
 	 */
-	protected final String m_variable;
+	protected final Placeholder<?> m_variable;
 
 	/**
 	 * Creates a new constant.
@@ -50,7 +51,7 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	 * @param value
 	 *          The value of the constant
 	 */
-	public LabelOf(String variable)
+	public LabelOf(Placeholder<?> variable)
 	{
 		super();
 		m_variable = variable;
@@ -59,7 +60,7 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	@Override
 	public Object evaluate(KnowledgeGraph g, Valuation nu)
 	{
-		Object o = nu.get(m_variable);
+		Object o = m_variable.getValue(g, nu);
 		if (o == null || !(o instanceof GraphNode))
 		{
 			return null;
@@ -87,7 +88,8 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	@Override
 	public void evaluate(Object[] inputs, Object[] outputs, Context c, EventTracker t)
 	{
-		Object o = getFromContext(c, m_variable, null);
+		KnowledgeGraph g = (KnowledgeGraph) inputs[0];
+		Object o = m_variable.getValue(g, c);
 		if (o == null || !(o instanceof GraphNode))
 		{
 			outputs[0] = null;

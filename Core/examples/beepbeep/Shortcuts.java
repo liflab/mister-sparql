@@ -10,11 +10,12 @@ import ca.uqac.lif.cep.ltl.Every;
 import ca.uqac.lif.cep.ltl.Some;
 import ca.uqac.lif.cep.ltl.Troolean;
 import ca.uqac.lif.cep.ltl.TrooleanCast;
+import ca.uqac.lif.cep.util.Equals;
 import ca.uqac.lif.cep.util.Numbers;
-import ca.uqac.lif.sparql.DottedVariable;
 import ca.uqac.lif.sparql.GetNodes;
 import ca.uqac.lif.sparql.LabelOf;
-import ca.uqac.lif.sparql.ConnectedBy.DirectedConnectedBy;
+import ca.uqac.lif.sparql.Placeholder;
+import ca.uqac.lif.sparql.ConnectedBy;
 
 public class Shortcuts
 {
@@ -48,19 +49,24 @@ public class Shortcuts
 		return new FunctionTree(Troolean.IMPLIES_FUNCTION, cast(phi), cast(psi));
 	}
 	
-	public static Function l(String x)
+	public static Function l(Object x)
 	{
-		return new LabelOf(x);
+		return LabelOf.l(x);
 	}
 	
-	public static Function dot(String x)
+	public static Placeholder<?> dot(String s)
 	{
-		return new DottedVariable(x);
+		return new Placeholder.DottedNodePlaceholder(s);
 	}
 	
 	public static Function connected(String from, String label, String to)
 	{
-		return new DirectedConnectedBy(from, label, to);
+		return ConnectedBy.connected(from, label, to);
+	}
+	
+	public static Function eq(Function x, Function y)
+	{
+		return cast(new FunctionTree(Equals.instance, x, y));
 	}
 	
 	public static Function gt(Function phi, Function psi)
