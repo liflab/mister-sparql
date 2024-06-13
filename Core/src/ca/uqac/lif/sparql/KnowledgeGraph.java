@@ -198,13 +198,13 @@ public class KnowledgeGraph
 	 * given ID.
 	 * @param id The ID of the node
 	 * @param data The data inside the node
-	 * @return The new node instance
+	 * @return The graph
 	 */
-	public GraphNode setNodeData(long id, Object data)
+	public KnowledgeGraph setNodeData(long id, Object data)
 	{
 		WritableGraphNode node = new WritableGraphNode(id, data);
 		m_nodes.put(id, node);
-		return node;
+		return this;
 	}
 	
 	/**
@@ -217,9 +217,9 @@ public class KnowledgeGraph
 	 * @param label The current label of the edge
 	 * @param to The ID of the node at the target of the edge
 	 * @param new_label The new label to give to the edge
-	 * @return The new edge instance
+	 * @return The graph
 	 */
-	public GraphEdge setEdgeData(long from, String label, long to, String new_label)
+	public KnowledgeGraph setEdgeData(long from, String label, long to, String new_label)
 	{
 		if (!m_edges.containsKey(from))
 		{
@@ -239,7 +239,7 @@ public class KnowledgeGraph
 		}
 		WritableGraphEdge edge = new WritableGraphEdge(from, new_label, to);
 		edges.add(edge);
-		return edge;
+		return this;
 	}
 	
 	/**
@@ -248,13 +248,13 @@ public class KnowledgeGraph
 	 * @param from The ID of the node at the source of the edge
 	 * @param label The current label of the edge
 	 * @param to The ID of the node at the target of the edge
-	 * @return {@code true} if an edge was deleted, {@code false} otherwise
+	 * @return The graph
 	 */
-	public boolean deleteEdge(long from, String label, long to)
+	public KnowledgeGraph deleteEdge(long from, String label, long to)
 	{
 		if (!m_edges.containsKey(from))
 		{
-			return false;
+			return this;
 		}
 		Set<GraphEdge> edges = m_edges.get(from);
 		Iterator<GraphEdge> it = edges.iterator();
@@ -265,10 +265,10 @@ public class KnowledgeGraph
 			{
 				it.remove();
 				// We break since there is at most one edge with given triplet
-				return true;
+				return this;
 			}
 		}
-		return false;
+		return this;
 	}
 	
 	/**
@@ -277,11 +277,11 @@ public class KnowledgeGraph
 	 * @param id The ID of the node to delete
 	 * @return {@code true} if a node was deleted, {@code false} otherwise
 	 */
-	public boolean deleteNode(long id)
+	public KnowledgeGraph deleteNode(long id)
 	{
 		if (!m_nodes.containsKey(id))
 		{
-			return false;
+			return this;
 		}
 		m_nodes.remove(id);
 		m_edges.remove(id);
@@ -297,7 +297,7 @@ public class KnowledgeGraph
 				}
 			}
 		}
-		return true;
+		return this;
 	}
 
 	/**

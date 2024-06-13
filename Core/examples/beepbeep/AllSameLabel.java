@@ -26,12 +26,11 @@ import ca.uqac.lif.cep.io.Print.Println;
 import ca.uqac.lif.sparql.KnowledgeGraph;
 
 /**
- * Evaluates the LTL-QG formula stipulating that there exists a node
- * that has the same label in every state.
+ * Evaluates the LTL-QG formula stipulating that every node in a graph has
+ * the same label in the next state of the graph.
  */
 public class AllSameLabel
 {
-
 	public static void main(String[] args)
 	{
 		Processor phi = G(forAllNodes("$x", X(eq(l("$x"), l(dot("$x"))))));

@@ -39,33 +39,35 @@ public class OnlyNeighborsChange
 						forAllNodes("$y",
 								implies(not(eq("$x", "$y")),
 										X(implies(
-												and(not(toProcessor(eq(l("$x"), l(dot("$x"))))), not(toProcessor(eq(l("$y"), l(dot("$y")))))),
-												toProcessor(connected("$x", "r", "$y")))
+												and(not(eq(l("$x"), l(dot("$x")))), not(eq(l("$y"), l(dot("$y"))))),
+												connected("$x", "r", "$y"))
 												)))
-								));
+						));
 		Println print = new Println();
 		connect(phi, print);
 		Pushable p = phi.getPushableInput();
+		KnowledgeGraph g = new KnowledgeGraph();
 		{
 			/* Create and push a first graph */
-			KnowledgeGraph g = new KnowledgeGraph();
-			g.addNode(0, "A");
-			g.addNode(1, "B");
-			g.addNode(2, "C");
-			g.addEdge(0, "r", 1);
-			g.addEdge(1, "r", 0);
+			g = g.duplicate()
+					.addNode(0, "A")
+					.addNode(1, "B")
+					.addNode(2, "C")
+					.addEdge(0, "r", 1)
+					.addEdge(1, "r", 0);
 			p.push(g);
 		}
 		{
-			/* Create and push a second graph. Note that the node IDs are reversed
-			 * with respect to the previous graph, but this does not matter for
-			 * the property to evaluate. */
-			KnowledgeGraph g = new KnowledgeGraph();
-			g.addNode(0, "A");
-			g.addNode(1, "C");
-			g.addNode(2, "Z");
-			g.addEdge(0, "r", 1);
-			g.addEdge(1, "r", 0);
+			/* Create and push a second graph. Node 2 changes to Z but this does not
+			 * violate the property as no other node changed its label. */
+			g = g.duplicate()
+					.setNodeData(2, "Z");
+			p.push(g);
+		}
+		{
+			/* Create and push a third graph. */
+			g = g.duplicate()
+					.setNodeData(0, "F");
 			p.push(g);
 		}
 	}

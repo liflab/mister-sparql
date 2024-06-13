@@ -26,23 +26,6 @@ import ca.uqac.lif.sparql.Dot;
 
 public class Shortcuts
 {
-
-
-	public static Processor implies(Processor phi, Processor psi)
-	{
-		return new TrooleanImpliesProcessor(phi, psi);
-	}
-
-	public static Processor and(Processor phi, Processor psi)
-	{
-		return new TrooleanAndProcessor(phi, psi);
-	}
-
-	public static Processor not(Processor phi)
-	{
-		return new TrooleanNotProcessor(phi);
-	}
-	
 	/* -------- Graph-specific functions -------- */
 
 	public static Function l(Object x)
@@ -95,6 +78,21 @@ public class Shortcuts
 	}
 
 	/* -------- LTL Troolean logical operators -------- */
+	
+	public static Processor implies(Object phi, Object psi)
+	{
+		return new TrooleanImpliesProcessor(toProcessor(phi), toProcessor(psi));
+	}
+
+	public static Processor and(Object phi, Object psi)
+	{
+		return new TrooleanAndProcessor(toProcessor(phi), toProcessor(psi));
+	}
+
+	public static Processor not(Object phi)
+	{
+		return new TrooleanNotProcessor(toProcessor(phi));
+	}
 
 	public static Function cast(Function f)
 	{
