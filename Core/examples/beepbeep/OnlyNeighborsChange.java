@@ -35,14 +35,13 @@ public class OnlyNeighborsChange
 	public static void main(String[] args)
 	{
 		Processor phi = G(
-				forAllNodes("$x",
-						forAllNodes("$y",
-								implies(not(eq("$x", "$y")),
-										X(implies(
-												and(not(eq(l("$x"), l(dot("$x")))), not(eq(l("$y"), l(dot("$y"))))),
-												connected("$x", "r", "$y"))
-												)))
-						));
+				forAllNodes("$x", forAllNodes("$y",
+						implies(
+								not(eq("$x", "$y")),
+								X (implies(
+										and(not(eq(l("$x"), l(dot("$x")))), not(eq(l("$y"), l(dot("$y"))))),
+										connected("$x", "r", "$y")
+										))))));
 		Println print = new Println();
 		connect(phi, print);
 		Pushable p = phi.getPushableInput();
@@ -61,15 +60,11 @@ public class OnlyNeighborsChange
 			/* Create and push a second graph. Node 2 changes to Z but this does not
 			 * violate the property as no other node changed its label. */
 			g = g.duplicate()
-					.setNodeData(2, "Z");
-			p.push(g);
-		}
-		{
-			/* Create and push a third graph. */
-			g = g.duplicate()
-					.setNodeData(0, "F");
+					.setNodeData(0, "foo")
+					.setNodeData(1, "bar")
+					.deleteEdge(0, "r", 1);
+			//.setNodeData(2, "Z");
 			p.push(g);
 		}
 	}
-
 }
