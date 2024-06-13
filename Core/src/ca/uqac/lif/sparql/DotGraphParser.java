@@ -43,7 +43,7 @@ public class DotGraphParser implements GraphParser
 			{
 				long id = Long.parseLong(node_matcher.group(1));
 				String label = node_matcher.group(2);
-				g.add(new GraphNode(id, readFromString(label)));
+				g.addNode(id, readFromString(label));
 				continue;
 			}
 			Matcher edge_matcher = s_edgePattern.matcher(line);
@@ -52,7 +52,7 @@ public class DotGraphParser implements GraphParser
 				long source = Long.parseLong(edge_matcher.group(1));
 				long dest = Long.parseLong(edge_matcher.group(2));
 				String label = edge_matcher.group(3);
-				g.add(new GraphEdge(source, label, dest));
+				g.addEdge(source, label, dest);
 				continue;
 			}
 		}

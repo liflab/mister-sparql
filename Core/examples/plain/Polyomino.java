@@ -28,8 +28,6 @@ import static ca.uqac.lif.sparql.IsEqualTo.eq;
 import static ca.uqac.lif.sparql.LabelOf.l;
 
 import ca.uqac.lif.sparql.GraphAssertion;
-import ca.uqac.lif.sparql.GraphEdge;
-import ca.uqac.lif.sparql.GraphNode;
 import ca.uqac.lif.sparql.KnowledgeGraph;
 
 /**
@@ -98,7 +96,7 @@ public class Polyomino
 			for (int i = 0; i < line.length(); i++)
 			{
 				String c = line.substring(i, i + 1);
-				g.add(new GraphNode(getId(height, i, width), c));
+				g.addNode(getId(height, i, width), c);
 			}
 			height++;
 		}
@@ -108,7 +106,7 @@ public class Polyomino
 		{
 			for (int col = 0; col < width - 1; col++)
 			{
-				g.add(new GraphEdge(getId(line, col, width), "", getId(line, col + 1, width)));
+				g.addEdge(getId(line, col, width), "", getId(line, col + 1, width));
 			}
 		}
 		// Create vertical adjacency
@@ -116,7 +114,7 @@ public class Polyomino
 		{
 			for (int col = 0; col < width; col++)
 			{
-				g.add(new GraphEdge(getId(line, col, width), "", getId(line + 1, col, width)));
+				g.addEdge(getId(line, col, width), "", getId(line + 1, col, width));
 			}
 		}
 		return g;

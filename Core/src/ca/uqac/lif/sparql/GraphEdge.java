@@ -21,22 +21,22 @@ package ca.uqac.lif.sparql;
  * Represents an edge in a knowledge graph.
  * @author Sylvain Hallé
  */
-public class GraphEdge
+public abstract class GraphEdge
 {
 	/**
 	 * The identifier of the source node of this edge.
 	 */
-	protected final long m_from;
+	private final long m_from;
 	
 	/**
 	 * The identifier of the destination node of this edge.
 	 */
-	protected final long m_to;
+	private final long m_to;
 	
 	/**
 	 * The label of this edge.
 	 */
-	protected final String m_label;
+	private final String m_label;
 	
 	/**
 	 * Creates a new edge.
@@ -48,7 +48,7 @@ public class GraphEdge
 	 * @param to
 	 *          The destination node
 	 */
-	public GraphEdge(long from, String label, long to)
+	protected GraphEdge(long from, String label, long to)
 	{
 		super();
 		m_from = from;

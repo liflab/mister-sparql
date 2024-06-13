@@ -55,7 +55,7 @@ public class TicTacToe
                 + "OXO"
                 + "  O";
 		for (int i = 0; i < 9; i++)
-			g.getNode(i + 1).setData(grid.substring(i, i + 1));
+			g.setNodeData(i + 1, grid.substring(i, i + 1));
 		
 		/* Express the winning condition for some player. The condition is that
 		 * there exists a chain of three nodes with the same label that are

@@ -23,8 +23,6 @@ import static ca.uqac.lif.cep.Connector.connect;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.io.Print.Println;
-import ca.uqac.lif.sparql.GraphEdge;
-import ca.uqac.lif.sparql.GraphNode;
 import ca.uqac.lif.sparql.KnowledgeGraph;
 
 /**
@@ -43,9 +41,9 @@ public class AllSameLabel
 		{
 			/* Create and push a first graph */
 			KnowledgeGraph g = new KnowledgeGraph(0);
-			g.add(new GraphNode(0, "A"));
-			g.add(new GraphNode(1, "B"));
-			g.add(new GraphEdge(0, "r", 1));
+			g.addNode(0, "A");
+			g.addNode(1, "B");
+			g.addEdge(0, "r", 1);
 			p.push(g);
 		}
 		{
@@ -53,18 +51,18 @@ public class AllSameLabel
 			 * with respect to the previous graph, but this does not matter for
 			 * the property to evaluate. */
 			KnowledgeGraph g = new KnowledgeGraph(1);
-			g.add(new GraphNode(0, "A"));
-			g.add(new GraphNode(1, "B"));
-			g.add(new GraphEdge(1, "r", 0));
+			g.addNode(0, "A");
+			g.addNode(1, "B");
+			g.addEdge(1, "r", 0);
 			p.push(g);
 		}
 		{
 			/* Create and push a third graph. This graph does not satisfy the
 			 * condition, causing the temporal formula to become false. */
 			KnowledgeGraph g = new KnowledgeGraph(2);
-			g.add(new GraphNode(0, "A"));
-			g.add(new GraphNode(1, "C"));
-			g.add(new GraphEdge(1, "z", 0));
+			g.addNode(0, "A");
+			g.addNode(1, "C");
+			g.addEdge(1, "z", 0);
 			p.push(g);
 		}
 	}

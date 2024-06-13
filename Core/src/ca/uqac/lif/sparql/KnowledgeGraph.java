@@ -20,6 +20,7 @@ package ca.uqac.lif.sparql;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,23 +29,23 @@ public class KnowledgeGraph
 	/**
 	 * Counter for the unique identifiers of graphs.
 	 */
-	protected static long s_idCounter = 0;
+	private static long s_idCounter = 0;
 	
 	/**
 	 * A unique numerical identifier given to the graph.
 	 */
-	protected final long m_id;
+	private final long m_id;
 	
 	/**
 	 * The nodes of the graph.
 	 */
-	/*@ non_null @*/ protected final Map<Long,GraphNode> m_nodes;
+	/*@ non_null @*/ private final Map<Long,GraphNode> m_nodes;
 
 	/**
 	 * The edges of the graph. The key in this map is the identifier of the
 	 * source node of the edge.
 	 */
-	/*@ non_null @*/ protected final Map<Long,Set<GraphEdge>> m_edges;
+	/*@ non_null @*/ private final Map<Long,Set<GraphEdge>> m_edges;
 	
 	/**
 	 * Creates a new empty knowledge graph and assigns it a unique identifier.
@@ -60,15 +61,10 @@ public class KnowledgeGraph
 	 */
 	public KnowledgeGraph(long id)
 	{
-		this(id, new HashMap<Long,GraphNode>(), new HashMap<Long,Set<GraphEdge>>());
-	}
-
-	public KnowledgeGraph(long id, /*@ non_null @*/ Map<Long,GraphNode> nodes, /*@ non_null @*/ Map<Long,Set<GraphEdge>> edges)
-	{
 		super();
 		m_id = id;
-		m_nodes = nodes;
-		m_edges = edges;
+		m_nodes = new HashMap<>();
+		m_edges = new HashMap<>();
 	}
 	
 	/**
@@ -88,9 +84,9 @@ public class KnowledgeGraph
 	 *          The node to add
 	 * @return This graph
 	 */
-	/*@ non_null @*/ public KnowledgeGraph add(/*@ non_null @*/ GraphNode node)
+	/*@ non_null @*/ public KnowledgeGraph addNode(long id, Object data)
 	{
-		m_nodes.put(node.getId(), node);
+		setNodeData(id, data);
 		return this;
 	}
 
@@ -101,8 +97,9 @@ public class KnowledgeGraph
 	 *          The edge to add
 	 * @return This graph
 	 */
-	/*@ non_null @*/ public KnowledgeGraph add(/*@ non_null @*/ GraphEdge edge)
+	/*@ non_null @*/ public KnowledgeGraph addEdge(long from, String label, long to)
 	{
+		WritableGraphEdge edge = new WritableGraphEdge(from, label, to);
 		if (!m_edges.containsKey(edge.getFrom()))
 		{
 			m_edges.put(edge.getFrom(), new HashSet<GraphEdge>());
@@ -124,8 +121,24 @@ public class KnowledgeGraph
 	 */
 	public KnowledgeGraph connect(long from, String label, long to)
 	{
-		add(new GraphEdge(from, label, to));
-		return this;
+		return addEdge(from, label, to);
+	}
+	
+	/**
+	 * Creates a copy of this graph.
+	 * @return A copy of the graph
+	 */
+	public KnowledgeGraph duplicate()
+	{
+		KnowledgeGraph g = new KnowledgeGraph();
+		g.m_nodes.putAll(m_nodes);
+		for (Map.Entry<Long,Set<GraphEdge>> entry : m_edges.entrySet())
+		{
+			Set<GraphEdge> new_set = new HashSet<GraphEdge>();
+			new_set.addAll(entry.getValue());
+			g.m_edges.put(entry.getKey(), new_set);
+		}
+		return g;
 	}
 
 	/**
@@ -175,6 +188,116 @@ public class KnowledgeGraph
 	public GraphNode getNode(long id)
 	{
 		return m_nodes.get(id);
+	}
+	
+	/**
+	 * Changes the data associated to a node ID. If the node with given ID does
+	 * not exist, it is created; otherwise, the instance of the node with that ID
+	 * is erased from the graph and is replaced by the newly created node. This
+	 * operation does not change any of the edges associated to the node with
+	 * given ID.
+	 * @param id The ID of the node
+	 * @param data The data inside the node
+	 * @return The new node instance
+	 */
+	public GraphNode setNodeData(long id, Object data)
+	{
+		WritableGraphNode node = new WritableGraphNode(id, data);
+		m_nodes.put(id, node);
+		return node;
+	}
+	
+	/**
+	 * Changes the label associated to an edge. The edge to modify is specified
+	 * the triplet (ID<sub>from</sub>, label, ID<sub>to</sub>). If the edge with
+	 * given triplet does not exist, it is created; otherwise, the instance of the
+	 * edge with that triplet is erased from the graph and is replaced by the
+	 * newly created edge.
+	 * @param from The ID of the node at the source of the edge
+	 * @param label The current label of the edge
+	 * @param to The ID of the node at the target of the edge
+	 * @param new_label The new label to give to the edge
+	 * @return The new edge instance
+	 */
+	public GraphEdge setEdgeData(long from, String label, long to, String new_label)
+	{
+		if (!m_edges.containsKey(from))
+		{
+			m_edges.put(from, new HashSet<GraphEdge>());
+		}
+		Set<GraphEdge> edges = m_edges.get(from);
+		Iterator<GraphEdge> it = edges.iterator();
+		while (it.hasNext())
+		{
+			GraphEdge e = it.next();
+			if (e.getFrom() == from && e.getLabel().compareTo(label) == 0 && e.getTo() == to)
+			{
+				it.remove();
+				// We break since there is at most one edge with given triplet
+				break;
+			}
+		}
+		WritableGraphEdge edge = new WritableGraphEdge(from, new_label, to);
+		edges.add(edge);
+		return edge;
+	}
+	
+	/**
+	 * Deletes an edge from the graph.  The edge to modify is specified
+	 * the triplet (ID<sub>from</sub>, label, ID<sub>to</sub>).
+	 * @param from The ID of the node at the source of the edge
+	 * @param label The current label of the edge
+	 * @param to The ID of the node at the target of the edge
+	 * @return {@code true} if an edge was deleted, {@code false} otherwise
+	 */
+	public boolean deleteEdge(long from, String label, long to)
+	{
+		if (!m_edges.containsKey(from))
+		{
+			return false;
+		}
+		Set<GraphEdge> edges = m_edges.get(from);
+		Iterator<GraphEdge> it = edges.iterator();
+		while (it.hasNext())
+		{
+			GraphEdge e = it.next();
+			if (e.getFrom() == from && e.getLabel().compareTo(label) == 0 && e.getTo() == to)
+			{
+				it.remove();
+				// We break since there is at most one edge with given triplet
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Deletes a node with given ID. All edges connected to that node in either
+	 * direction are also deleted.
+	 * @param id The ID of the node to delete
+	 * @return {@code true} if a node was deleted, {@code false} otherwise
+	 */
+	public boolean deleteNode(long id)
+	{
+		if (!m_nodes.containsKey(id))
+		{
+			return false;
+		}
+		m_nodes.remove(id);
+		m_edges.remove(id);
+		for (Map.Entry<Long,Set<GraphEdge>> entry : m_edges.entrySet())
+		{
+			Iterator<GraphEdge> it = entry.getValue().iterator();
+			while (it.hasNext())
+			{
+				GraphEdge e = it.next();
+				if (e.getFrom() == id || e.getTo() == id)
+				{
+					it.remove();
+				}
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -252,5 +375,21 @@ public class KnowledgeGraph
 			}
 		}
 		return false;
+	}
+	
+	public static class WritableGraphNode extends GraphNode
+	{
+		protected WritableGraphNode(long id, Object data)
+		{
+			super(id, data);
+		}
+	}
+	
+	public static class WritableGraphEdge extends GraphEdge
+	{
+		protected WritableGraphEdge(long from, String label, long to)
+		{
+			super(from, label, to);
+		}
 	}
 }

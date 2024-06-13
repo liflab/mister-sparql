@@ -21,39 +21,28 @@ package ca.uqac.lif.sparql;
  * Represents a node in a knowledge graph.
  * @author Sylvain Hallé
  */
-public class GraphNode 
+public abstract class GraphNode 
 {
 	/**
 	 * The unique identifier of this node.
 	 */
-	protected final long m_id;
+	private final long m_id;
 	
 	/**
 	 * The data associated with this node.
 	 */
-	protected Object m_data;
+	private final Object m_data;
 	
 	/**
 	 * Creates a new node.
 	 * @param id The unique identifier of this node
 	 * @param data The data associated with this node
 	 */
-	public GraphNode(long id, Object data)
+	protected GraphNode(long id, Object data)
 	{
 		super();
 		m_id = id;
 		m_data = data;
-	}
-	
-	/**
-	 * Sets the data associated with this node.
-	 * 
-	 * @param o
-	 *          The data
-	 */
-	public void setData(Object o)
-	{
-		m_data = o;
 	}
 	
 	/**

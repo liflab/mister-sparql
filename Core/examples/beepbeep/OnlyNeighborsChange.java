@@ -23,8 +23,6 @@ import static ca.uqac.lif.cep.Connector.connect;
 import ca.uqac.lif.cep.Processor;
 import ca.uqac.lif.cep.Pushable;
 import ca.uqac.lif.cep.io.Print.Println;
-import ca.uqac.lif.sparql.GraphEdge;
-import ca.uqac.lif.sparql.GraphNode;
 import ca.uqac.lif.sparql.KnowledgeGraph;
 
 /**
@@ -51,11 +49,11 @@ public class OnlyNeighborsChange
 		{
 			/* Create and push a first graph */
 			KnowledgeGraph g = new KnowledgeGraph();
-			g.add(new GraphNode(0, "A"));
-			g.add(new GraphNode(1, "B"));
-			g.add(new GraphNode(2, "C"));
-			g.add(new GraphEdge(0, "r", 1));
-			g.add(new GraphEdge(1, "r", 0));
+			g.addNode(0, "A");
+			g.addNode(1, "B");
+			g.addNode(2, "C");
+			g.addEdge(0, "r", 1);
+			g.addEdge(1, "r", 0);
 			p.push(g);
 		}
 		{
@@ -63,11 +61,11 @@ public class OnlyNeighborsChange
 			 * with respect to the previous graph, but this does not matter for
 			 * the property to evaluate. */
 			KnowledgeGraph g = new KnowledgeGraph();
-			g.add(new GraphNode(0, "A"));
-			g.add(new GraphNode(1, "C"));
-			g.add(new GraphNode(2, "Z"));
-			g.add(new GraphEdge(0, "r", 1));
-			g.add(new GraphEdge(1, "r", 0));
+			g.addNode(0, "A");
+			g.addNode(1, "C");
+			g.addNode(2, "Z");
+			g.addEdge(0, "r", 1);
+			g.addEdge(1, "r", 0);
 			p.push(g);
 		}
 	}
