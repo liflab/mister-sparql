@@ -48,8 +48,8 @@ public class SortedDag
 		/* Express the condition that the graph is a sorted DAG. */
 		Processor sorted = forAllNodes("$x", forAllNodes("$y",
 				implies(
-						apply(connected("$x", "", "$y")), 
-						apply(gt(l("$y"), l("$x"))))));
+						toProcessor(connected("$x", "", "$y")), 
+						toProcessor(gt(l("$y"), l("$x"))))));
 
 		/* Evaluate the assertion. */
 		Println print = new Println();

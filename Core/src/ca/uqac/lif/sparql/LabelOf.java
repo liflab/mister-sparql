@@ -19,6 +19,8 @@ package ca.uqac.lif.sparql;
 
 import ca.uqac.lif.cep.Context;
 import ca.uqac.lif.cep.EventTracker;
+import ca.uqac.lif.cep.functions.Constant;
+import ca.uqac.lif.cep.functions.ContextVariable;
 import ca.uqac.lif.cep.functions.Function;
 
 /**
@@ -34,16 +36,16 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	 *          The variable
 	 * @return The instance 
 	 * */
-	public static LabelOf l(Object o)
+	public static LabelOf l(String s)
 	{
-		Placeholder<?> p_variable = Placeholder.getNodePlaceholder(o); 
+		Function p_variable = s.startsWith("$") ? new ContextVariable(s) : new Constant(s); 
 		return new LabelOf(p_variable);
 	}
 	
 	/** 
 	 * The value of the variable.
 	 */
-	protected final Placeholder<?> m_variable;
+	protected final Function m_variable;
 
 	/**
 	 * Creates a new constant.
@@ -51,7 +53,7 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	 * @param value
 	 *          The value of the constant
 	 */
-	public LabelOf(Placeholder<?> variable)
+	public LabelOf(Function variable)
 	{
 		super();
 		m_variable = variable;
@@ -60,7 +62,7 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	@Override
 	public Object evaluate(KnowledgeGraph g, Valuation nu)
 	{
-		Object o = m_variable.getValue(g, nu);
+		Object o = evaluateFromValuation(m_variable, g, nu);
 		if (o == null || !(o instanceof GraphNode))
 		{
 			return null;
@@ -89,7 +91,7 @@ public class LabelOf extends ContextFunction implements GraphFunction<Object>
 	public void evaluate(Object[] inputs, Object[] outputs, Context c, EventTracker t)
 	{
 		KnowledgeGraph g = (KnowledgeGraph) inputs[0];
-		Object o = m_variable.getValue(g, c);
+		Object o = evaluateFromContext(m_variable, g, c);
 		if (o == null || !(o instanceof GraphNode))
 		{
 			outputs[0] = null;

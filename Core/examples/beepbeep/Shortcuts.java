@@ -1,7 +1,8 @@
 package beepbeep;
 
 import ca.uqac.lif.cep.Processor;
-import ca.uqac.lif.cep.functions.ApplyFunction;
+import ca.uqac.lif.cep.functions.Constant;
+import ca.uqac.lif.cep.functions.ContextVariable;
 import ca.uqac.lif.cep.functions.Function;
 import ca.uqac.lif.cep.functions.FunctionTree;
 import ca.uqac.lif.cep.ltl.After;
@@ -15,109 +16,86 @@ import ca.uqac.lif.cep.util.Equals;
 import ca.uqac.lif.cep.util.Numbers;
 import ca.uqac.lif.sparql.GetNodes;
 import ca.uqac.lif.sparql.LabelOf;
-import ca.uqac.lif.sparql.Placeholder;
 import ca.uqac.lif.sparql.TrooleanAndProcessor;
+import ca.uqac.lif.sparql.TrooleanApplyFunction;
 import ca.uqac.lif.sparql.TrooleanImpliesProcessor;
 import ca.uqac.lif.sparql.TrooleanNotProcessor;
-import ca.uqac.lif.sparql.ConnectedBy;
+import ca.uqac.lif.sparql.ConnectedBy.DirectedConnectedBy;
+import ca.uqac.lif.sparql.ConnectedBy.UndirectedConnectedBy;
+import ca.uqac.lif.sparql.Dot;
 
 public class Shortcuts
 {
-	public static Processor forAllNodes(String var, Processor phi)
-	{
-		return new Every(var, new GetNodes(), phi);
-	}
-	
-	public static Processor forAllNodes(String var, Function f)
-	{
-		return new Every(var, new GetNodes(), apply(f));
-	}
-	
-	public static Processor existsNode(String var, Processor phi)
-	{
-		return new Some(var, new GetNodes(), phi);
-	}
-	
-	public static Processor existsNode(String var, Function f)
-	{
-		return new Some(var, new GetNodes(), apply(f));
-	}
-	
-	public static Processor apply(Function f)
-	{
-		return new ApplyFunction(f);
-	}
-	
+
+
 	public static Processor implies(Processor phi, Processor psi)
 	{
 		return new TrooleanImpliesProcessor(phi, psi);
 	}
-	
+
 	public static Processor and(Processor phi, Processor psi)
 	{
 		return new TrooleanAndProcessor(phi, psi);
 	}
-	
+
 	public static Processor not(Processor phi)
 	{
 		return new TrooleanNotProcessor(phi);
 	}
 	
+	/* -------- Graph-specific functions -------- */
+
 	public static Function l(Object x)
 	{
-		return LabelOf.l(x);
+		return new LabelOf(toFunction(x));
 	}
-	
-	public static Placeholder<?> dot(String s)
+
+	public static Function dot(String s)
 	{
-		return new Placeholder.DottedNodePlaceholder(s);
+		return new Dot(s);
 	}
-	
+
 	public static Function connected(Object from, Object label, Object to)
 	{
-		return ConnectedBy.connected(from, label, to);
+		return new DirectedConnectedBy(toFunction(from), toFunction(label), toFunction(to));
 	}
 	
-	public static Function eq(Function x, Function y)
+	public static Function connectedUndir(Object from, Object label, Object to)
 	{
-		return cast(new FunctionTree(Equals.instance, x, y));
+		return new UndirectedConnectedBy(toFunction(from), toFunction(label), toFunction(to));
 	}
 	
+	/* -------- LTL Troolean comparison operators -------- */
+
+	public static Processor eq(Object x, Object y)
+	{
+		return toProcessor(cast(new FunctionTree(Equals.instance, toFunction(x), toFunction(y))));
+	}
+
 	public static Function gt(Function phi, Function psi)
 	{
 		return new FunctionTree(Numbers.isGreaterThan, phi, psi);
 	}
-	
-	public static Processor G(Processor phi)
+
+	/* -------- LTL Troolean temporal operators -------- */
+
+	public static Processor G(Object o)
 	{
-		return new Always(phi);
+		return new Always(toProcessor(o));
 	}
-	
-	public static Processor G(Function f)
+
+	public static Processor F(Object o)
 	{
-		return new Always(apply(f));
+		return new Sometime(toProcessor(o));
 	}
-	
-	public static Processor F(Processor phi)
+
+	public static Processor X(Object o)
 	{
-		return new Sometime(phi);
+		return new After(toProcessor(o));
 	}
-	
-	public static Processor F(Function f)
-	{
-		return new Sometime(apply(f));
-	}
-	
-	public static Processor X(Processor phi)
-	{
-		return new After(phi);
-	}
-	
-	public static Processor X(Function f)
-	{
-		return new After(apply(f));
-	}
-	
+
+	/* -------- LTL Troolean logical operators -------- */
+
 	public static Function cast(Function f)
 	{
 		if (f.getOutputTypeFor(0).equals(Troolean.Value.class))
@@ -125,5 +103,66 @@ public class Shortcuts
 			return f;
 		}
 		return new FunctionTree(TrooleanCast.instance, f);
+	}
+	
+	/* -------- LTL Troolean quantifiers -------- */
+	
+	public static Processor forAllNodes(String var, Object o)
+	{
+		return new Every(var, new GetNodes(), toProcessor(o));
+	}
+
+	public static Processor existsNode(String var, Object o)
+	{
+		return new Some(var, new GetNodes(), toProcessor(o));
+	}
+	
+	/* -------- Utility functions -------- */
+
+	/**
+	 * Lifts an arbitrary object into a BeepBeep {@link Function}. The rules for
+	 * the conversion are as follows:
+	 * <ul>
+	 * <li>If the object is already a {@link Function}, it is returned as is;</li>
+	 * <li>If the object is a string starting with the character '$', it is
+	 * converted into a {@link ContextVariable} with the same name;</li>
+	 * <li>Otherwise, the object is converted into a {@link Constant}.</li>
+	 * @param o The object to lift
+	 * @return The lifted object
+	 */
+	protected static Function toFunction(Object o)
+	{
+		if (o instanceof Function)
+		{
+			return (Function) o;
+		}
+		if (o instanceof String)
+		{
+			if (((String) o).startsWith("$"))
+			{
+				return new ContextVariable((String) o);
+			}
+		}
+		return new Constant(o);
+	}
+
+	/**
+	 * Lifts an arbitrary object into a BeepBeep {@link Processor}. The rules for
+	 * the conversion are as follows:
+	 * <ul>
+	 * <li>If the object is already a {@link Processor}, it is returned as is;</li>
+	 * <li>Otherwise, the object is converted into a {@link TrooleanApplyFunction}.</li>
+	 * </ul>
+	 * @param o The object to lift
+	 * @return The lifted function
+	 * @see #toFunction(Object)
+	 */
+	protected static Processor toProcessor(Object o)
+	{
+		if (o instanceof Processor)
+		{
+			return (Processor) o;
+		}
+		return new TrooleanApplyFunction(toFunction(o));
 	}
 }

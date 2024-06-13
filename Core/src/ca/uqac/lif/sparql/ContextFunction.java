@@ -3,6 +3,8 @@ package ca.uqac.lif.sparql;
 import java.util.Set;
 
 import ca.uqac.lif.cep.Context;
+import ca.uqac.lif.cep.functions.Constant;
+import ca.uqac.lif.cep.functions.ContextVariable;
 import ca.uqac.lif.cep.functions.Function;
 
 public abstract class ContextFunction extends Function
@@ -36,12 +38,25 @@ public abstract class ContextFunction extends Function
 	 * @param default_value The default value
 	 * @return The value of the variable in the context, or the default value
 	 */
-	protected static Object getFromContext(Context c, Object key, Object default_value)
+	protected static Object evaluateFromContext(Function f, Object input, Context c)
 	{
-		if (c == null)
+		Object[] inputs = new Object[] {input};
+		Object[] outputs = new Object[1];
+		f.evaluate(inputs, outputs, c, null);
+		return outputs[0];
+	}
+	
+	protected static Object evaluateFromValuation(Function f, Object input, Valuation nu)
+	{
+		if (f instanceof ContextVariable)
 		{
-			return default_value;
+			ContextVariable cv = (ContextVariable) f;
+			return nu.get(cv.getName());
 		}
-		return c.getOrDefault(key, default_value);
+		else if (f instanceof Constant)
+		{
+			return ((Constant) f).getValue();
+		}
+		return null;
 	}
 }

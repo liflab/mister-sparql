@@ -26,6 +26,16 @@ import java.util.Set;
 public class KnowledgeGraph
 {
 	/**
+	 * Counter for the unique identifiers of graphs.
+	 */
+	protected static long s_idCounter = 0;
+	
+	/**
+	 * A unique numerical identifier given to the graph.
+	 */
+	protected final long m_id;
+	
+	/**
 	 * The nodes of the graph.
 	 */
 	/*@ non_null @*/ protected final Map<Long,GraphNode> m_nodes;
@@ -35,22 +45,40 @@ public class KnowledgeGraph
 	 * source node of the edge.
 	 */
 	/*@ non_null @*/ protected final Map<Long,Set<GraphEdge>> m_edges;
-
+	
 	/**
-	 * Creates a new empty knowledge graph.
+	 * Creates a new empty knowledge graph and assigns it a unique identifier.
 	 */
 	public KnowledgeGraph()
 	{
-		super();
-		m_nodes = new HashMap<Long,GraphNode>();
-		m_edges = new HashMap<Long,Set<GraphEdge>>();
+		this(s_idCounter++);
 	}
 
-	public KnowledgeGraph(/*@ non_null @*/ Map<Long,GraphNode> nodes, /*@ non_null @*/ Map<Long,Set<GraphEdge>> edges)
+	/**
+	 * Creates a new empty knowledge graph.
+	 * @param id The unique identifier of the graph
+	 */
+	public KnowledgeGraph(long id)
+	{
+		this(id, new HashMap<Long,GraphNode>(), new HashMap<Long,Set<GraphEdge>>());
+	}
+
+	public KnowledgeGraph(long id, /*@ non_null @*/ Map<Long,GraphNode> nodes, /*@ non_null @*/ Map<Long,Set<GraphEdge>> edges)
 	{
 		super();
+		m_id = id;
 		m_nodes = nodes;
 		m_edges = edges;
+	}
+	
+	/**
+	 * Gets the unique identifier of this graph.
+	 * 
+	 * @return The identifier
+	 */
+	public long getId()
+	{
+		return m_id;
 	}
 
 	/**

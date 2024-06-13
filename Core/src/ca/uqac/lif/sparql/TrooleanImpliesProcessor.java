@@ -62,8 +62,8 @@ public class TrooleanImpliesProcessor extends UniformProcessor
 		{
 			m_leftPushable.push(inputs[0]);
 			m_rightPushable.push(inputs[0]);
-			Value left = Troolean.trooleanValue(m_leftSink.getLast());
-			Value right = Troolean.trooleanValue(m_rightSink.getLast());
+			Value left = Troolean.trooleanValue(m_leftSink.getLast()[0]);
+			Value right = Troolean.trooleanValue(m_rightSink.getLast()[0]);
 			m_verdict = Troolean.implies(left, right);
 		}
 		outputs[0] = m_verdict;
